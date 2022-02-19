@@ -25,105 +25,105 @@
 ### x86-64 gcc 11.2
 Предлагаемая функция:
 
-    ```cpp
-    bool isEven(int value)
-    {
-        return value % 2 == 0;
-    }
-    ```
+```cpp
+bool isEven(int value)
+{
+    return value % 2 == 0;
+}
+```
 
 Ассемблерный код:
     
-    ```asm
-    isEven(int):
-        push    rbp
-        mov     rbp, rsp
-        mov     DWORD PTR [rbp-4], edi
-        mov     eax, DWORD PTR [rbp-4]
-        and     eax, 1
-        test    eax, eax
-        sete    al
-        pop     rbp
-        ret
-    ```
+```asm
+isEven(int):
+    push    rbp
+    mov     rbp, rsp
+    mov     DWORD PTR [rbp-4], edi
+    mov     eax, DWORD PTR [rbp-4]
+    and     eax, 1
+    test    eax, eax
+    sete    al
+    pop     rbp
+    ret
+```
   
 Собственная функция: 
 
-    ```cpp
-    bool isEven(int value) 
-    {
-        return !(value & 1);
-    }
-    ```
+```cpp
+bool isEven(int value) 
+{
+    return !(value & 1);
+}
+```
 
 Ассемблерный код:
 
-    ```asm
-    isEven(int):
-        push    rbp
-        mov     rbp, rsp
-        mov     DWORD PTR [rbp-4], edi
-        mov     eax, DWORD PTR [rbp-4]
-        and     eax, 1
-        test    eax, eax
-        setne   al
-        pop     rbp
-        ret
-    ```
+```asm
+isEven(int):
+    push    rbp
+    mov     rbp, rsp
+    mov     DWORD PTR [rbp-4], edi
+    mov     eax, DWORD PTR [rbp-4]
+    and     eax, 1
+    test    eax, eax
+    setne   al
+    pop     rbp
+    ret
+```
 Как можно заметить, для последней версии gcc то, что получается в Ассемблерном коде,
 *буквально не отличается* в обоих вариантах.
 
 ### x64 msvc v19.30
 Предлагаемая функция:
 
-    ```asm
-    tv66 = 0
-    value$ = 32
-    bool isEven(int) PROC                             ; isEven
-    $LN5:
-    mov     DWORD PTR [rsp+8], ecx
-    sub     rsp, 24
-    mov     eax, DWORD PTR value$[rsp]
-    cdq
-    and     eax, 1
-    xor     eax, edx
-    sub     eax, edx
-    test    eax, eax
-    jne     SHORT $LN3@isEven
-    mov     DWORD PTR tv66[rsp], 1
-    jmp     SHORT $LN4@isEven
-    $LN3@isEven:
-    mov     DWORD PTR tv66[rsp], 0
-    $LN4@isEven:
-    movzx   eax, BYTE PTR tv66[rsp]
-    add     rsp, 24
-    ret     0
-    bool isEven(int) ENDP                             ; isEven
-    ```
+```asm
+tv66 = 0
+value$ = 32
+bool isEven(int) PROC                             ; isEven
+$LN5:
+mov     DWORD PTR [rsp+8], ecx
+sub     rsp, 24
+mov     eax, DWORD PTR value$[rsp]
+cdq
+and     eax, 1
+xor     eax, edx
+sub     eax, edx
+test    eax, eax
+jne     SHORT $LN3@isEven
+mov     DWORD PTR tv66[rsp], 1
+jmp     SHORT $LN4@isEven
+$LN3@isEven:
+mov     DWORD PTR tv66[rsp], 0
+$LN4@isEven:
+movzx   eax, BYTE PTR tv66[rsp]
+add     rsp, 24
+ret     0
+bool isEven(int) ENDP                             ; isEven
+```
 
 Собственная функция:  
 
-    ```asm
-    tv66 = 0
-    value$ = 32
-    bool isEven(int) PROC                             ; isEven
-    $LN5:
-    mov     DWORD PTR [rsp+8], ecx
-    sub     rsp, 24
-    mov     eax, DWORD PTR value$[rsp]
-    and     eax, 1
-    test    eax, eax
-    jne     SHORT $LN3@isEven
-    mov     DWORD PTR tv66[rsp], 1
-    jmp     SHORT $LN4@isEven
-    $LN3@isEven:
-    mov     DWORD PTR tv66[rsp], 0
-    $LN4@isEven:
-    movzx   eax, BYTE PTR tv66[rsp]
-    add     rsp, 24
-    ret     0
-    bool isEven(int) ENDP                             ; isEven
-    ```
+```asm
+tv66 = 0
+value$ = 32
+bool isEven(int) PROC                             ; isEven
+$LN5:
+mov     DWORD PTR [rsp+8], ecx
+sub     rsp, 24
+mov     eax, DWORD PTR value$[rsp]
+and     eax, 1
+test    eax, eax
+jne     SHORT $LN3@isEven
+mov     DWORD PTR tv66[rsp], 1
+jmp     SHORT $LN4@isEven
+$LN3@isEven:
+mov     DWORD PTR tv66[rsp], 0
+$LN4@isEven:
+movzx   eax, BYTE PTR tv66[rsp]
+add     rsp, 24
+ret     0
+bool isEven(int) ENDP                             ; isEven
+```
 
 В случае с MSVC для предлагаемого в задании варианта выполняются следующие
 команды: cdq, and, xor и sub, тогда как в приведенной мной реализации вместо
